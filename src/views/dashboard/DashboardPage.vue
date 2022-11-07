@@ -19,6 +19,11 @@ const loadings = reactive({
   isFetchingTokenOnDate: false
 })
 
+const errors = reactive({
+  fetchTokensPrice: false,
+  fetchTokenPriceOnDate: false
+})
+
 const selectedDate = ref('')
 const selectedDatePrice = ref('')
 const selectedToken = ref('none')
@@ -34,7 +39,8 @@ const canShowDatePrice = computed(() => {
   if (
     canShowDateInput.value && 
     selectedDate.value && 
-    !loadings.isFetchingTokenOnDate
+    !loadings.isFetchingTokenOnDate &&
+    !errors.fetchTokenPriceOnDate
   ) {
     return true
   }
@@ -45,6 +51,7 @@ const getTokensPrice = async () => {
   try {
     const tokensNamesParam = Object.keys(tokenPrices).join('%2C')
     const { data } = await http.get(`simple/price?ids=${tokensNamesParam}&vs_currencies=usd&precision=6`)
+    errors.fetchTokensPrice = false
     const tokensNames = Object.keys(data)
     const tokensPrices = Object.values(data)
     tokensPrices.forEach(({ usd: usdPrice }, tokenIndex) => {
@@ -52,6 +59,7 @@ const getTokensPrice = async () => {
       tokenPrices[currentToken].price = usdPrice
     })
   } catch (error) {
+    errors.fetchTokensPrice = true
     console.error(error)
   }
   setTimeout(() => {
@@ -69,9 +77,11 @@ const getTokenPriceInSpecificDate = async (tokenName, date) => {
       }
     })
     const { data } = await http.get(`coins/${tokenId}/history?date=${date}`)
+    errors.fetchTokenPriceOnDate = false
     const { usd: usdPrice } = data.market_data.current_price
     selectedDatePrice.value = usdPrice.toFixed(6)
   } catch(error) {
+    errors.fetchTokenPriceOnDate = true
     console.error(error)
   }
   loadings.isFetchingTokenOnDate = false
@@ -101,11 +111,19 @@ watch(selectedToken, (value) => {
     v-if="!loadings.isFetchingInitialTokens"
     class="mx-3 my-3"
   >
+    <div v-if="!errors.fetchTokensPrice">
+      <p
+        v-for="(token, index) in tokenPrices"
+        :key="`${token.name}-${index}`"
+      >
+        {{ token.name }} - ${{ token.price }} (USD)
+      </p>
+    </div>
     <div
-      v-for="(token, index) in tokenPrices"
-      :key="`${token.name}-${index}`"
+      v-else
+      class="my-8 text-center text-red-500"
     >
-      {{ token.name }} - ${{ token.price }} (USD)
+      An error has occurred while fetching Tokens price. Try again later.
     </div>
     <hr class="my-5" />
     <label
@@ -154,6 +172,12 @@ watch(selectedToken, (value) => {
       class="flex justify-center my-8"
     >
       <LoadingSpinner />
+    </div>
+    <div
+      v-else-if="errors.fetchTokenPriceOnDate"
+      class="my-8 text-center text-red-500"
+    >
+      An error has occurred while fetching {{ selectedToken }} price. Try again later.
     </div>
   </div>
   <GlobalLoadingSpinner v-else />
