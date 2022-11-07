@@ -5,7 +5,9 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [
-    vue(),
+    vue({
+      reactivityTransform: true
+    }),
     Components({
       dirs: ['src/'],
       extensions: ['vue'],
@@ -22,5 +24,6 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
-  }
+  },
+  base: 'https://antonyonscript.github.io/crypto-tokens-price/'
 })
