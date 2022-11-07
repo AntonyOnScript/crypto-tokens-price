@@ -10,6 +10,8 @@
     "lint": "eslint --fix --ext .js,.vue ."
   },
   "dependencies": {
+    "@vuepic/vue-datepicker": "^3.5.3",
+    "date-fns": "^2.29.3",
     "vue": "^3.2.41"
   },
   "devDependencies": {
