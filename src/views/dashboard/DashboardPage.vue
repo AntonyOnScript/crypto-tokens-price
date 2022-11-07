@@ -105,7 +105,7 @@ watch(selectedToken, (value) => {
       v-for="(token, index) in tokenPrices"
       :key="`${token.name}-${index}`"
     >
-      {{ token.name }} - {{ token.price }} (USD)
+      {{ token.name }} - ${{ token.price }} (USD)
     </div>
     <hr class="my-5" />
     <label
@@ -115,7 +115,7 @@ watch(selectedToken, (value) => {
     <select
       id="tokens"
       v-model="selectedToken"
-      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      class="bg-white border border-gray-300 text-gray-900 text-sm rounded focus:outline-none hover:border-gray-400 focus:border-gray-400 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
     >
       <option 
         value="none"
@@ -145,10 +145,18 @@ watch(selectedToken, (value) => {
     />
     <div
       v-if="canShowDatePrice"
+      class="my-8 text-center"
     >
       {{ selectedToken }} price at {{ format(selectedDate, 'MM/dd/yyyy') }} was ${{ selectedDatePrice }}
     </div>
+    <div
+      v-else-if="loadings.isFetchingTokenOnDate"
+      class="flex justify-center my-8"
+    >
+      <LoadingSpinner />
+    </div>
   </div>
+  <GlobalLoadingSpinner v-else />
 </template>
 
 <style scoped>
