@@ -1,3 +1,5 @@
+# List crypto prices vue 3 study
+
 To run locally you can use `docker-compose up` or `yarn dev`
 
 Here i used Vue 3 with Vite instead vue-cli because vite has more performance than that;
